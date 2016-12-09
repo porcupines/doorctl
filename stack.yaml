@@ -1,0 +1,9 @@
+resolver: lts-7.14
+packages:
+  - location: '.'
+extra-deps:
+  - dhall-1.0.1
+  - nfc-0.0.1
+  - resourcet-1.1.9
+flags: {}
+extra-package-dbs: []

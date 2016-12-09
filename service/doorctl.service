@@ -1,0 +1,13 @@
+[Unit]
+Description=Door Control Service
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=always
+RestartSec=3
+ExecStart=/usr/local/bin/doorctl /etc/doorctl.conf
+KillSignal=SIGKILL
+
+[Install]
+WantedBy=multi-user.target

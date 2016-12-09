@@ -1,0 +1,53 @@
+name: doorctl
+synopsis: doorctl provides card access control
+version: '0.0.0'
+license: PublicDomain
+maintainer: John Galt <jgalt@centromere.net>
+category: Other
+description: doorctl provides card access control
+extra-source-files:
+  - CHANGELOG.md
+  - package.yaml
+  - README.md
+  - stack.yaml
+ghc-options: -Wall
+
+library:
+  dependencies:
+    - aeson
+    - async
+    - base <5
+    - base64-bytestring
+    - base16-bytestring
+    - bytestring
+    - cryptonite
+    - directory
+    - dhall
+    - http-conduit
+    - lifted-base
+    - memory
+    - monad-control
+    - nfc
+    - resourcet >= 1.1.9
+    - text
+    - unix
+    - vector
+  source-dirs: src
+  exposed-modules:
+    - Config
+    - Reader
+    - Tags
+
+executables:
+  doorctl:
+    dependencies:
+      - async
+      - base <5
+      - doorctl
+      - text
+    ghc-options:
+      - -rtsopts
+      - -threaded
+      - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: doorctl
