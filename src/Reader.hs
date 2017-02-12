@@ -13,11 +13,11 @@ import qualified Data.ByteString.Base16 as B16 (encode)
 import Data.List                    (nub)
 import Data.Maybe                   (fromMaybe)
 import Data.Monoid                  ((<>))
-import qualified Data.Text.Lazy     as LT (unpack, toUpper)
-import qualified Data.Text.Lazy.IO  as LTIO (putStrLn)
+import qualified Data.Text.Lazy     as LT (unpack, toUpper, toStrict)
 import qualified Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import qualified Data.Vector        as V (toList)
 import Numeric.Natural              (Natural)
+import System.Console.Concurrent    (withConcurrentOutput, outputConcurrent)
 
 import qualified Bindings.NFC       as NFC
 
@@ -33,17 +33,17 @@ unlockDoor :: PinHandle -> IO ()
 unlockDoor = flip setPin PinLow
 
 cycleDoor :: PinHandle -> Natural -> IO ()
-cycleDoor ph unlockTime = do
+cycleDoor ph unlockTime = withConcurrentOutput $ do
   unlockDoor ph
-  putStrLn $ "[" <> show ph <> "] door unlocked"
+  outputConcurrent $ "[" <> show ph <> "] door unlocked\n"
 
   threadDelay . (* 1000000) . fromIntegral $ unlockTime
 
   lockDoor ph
-  putStrLn $ "[" <> show ph <> "] door locked"
+  outputConcurrent $ "[" <> show ph <> "] door locked\n"
 
 readerService :: Config -> MVar ValidTags -> IO [Async ()]
-readerService cfg vtVar = do
+readerService cfg vtVar = withConcurrentOutput $ do
   ctx <- NFC.initialize
 
   runResourceT $ do
@@ -56,11 +56,12 @@ readerService cfg vtVar = do
 
       liftIO $ do
         lockDoor allocatedPin
-        putStrLn $ "[" <> show allocatedPin <> "] door locked (startup)"
+        outputConcurrent $ "[" <> show allocatedPin <> "] door locked (startup)\n"
 
       return (pinNum, allocatedPin)
 
     forM (V.toList . readers $ cfg) $ \r -> resourceForkWith async . liftIO $ do
+      outputConcurrent $ "[" <> (LT.toStrict . readerId) r <> "] opening reader\n"
       -- Open the reader device and set it to initiator mode.
       maybeDev <- NFC.open ctx $ (LT.unpack . readerDev) r
       let dev = fromMaybe (error "error opening device") maybeDev
@@ -77,7 +78,7 @@ readerService cfg vtVar = do
       (_, NFC.NFCTargetISO14443a info) <- NFC.initiatorSelectPassiveTarget dev nfcMod Nothing
       let nfcValue = LT.toUpper . LE.decodeUtf8 . BL.fromStrict . B16.encode . NFC.iso14443aAbtUid $ info
 
-      LTIO.putStrLn $ "[" <> rid <> "] read tag: " <> nfcValue
+      outputConcurrent $ "[" <> LT.toStrict rid <> "] read tag: " <> LT.toStrict nfcValue <> "\n"
 
       vt <- readMVar vtVar
       let authorized = nfcValue `elem` vt

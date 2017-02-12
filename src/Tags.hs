@@ -4,20 +4,21 @@ module Tags
   , tagService
   ) where
 
-import Control.Concurrent       (threadDelay)
-import Control.Concurrent.Async (Async, async)
-import Control.Concurrent.MVar  (MVar, swapMVar)
-import Control.Exception        (onException)
-import Control.Monad            (forever, when, void)
-import Data.Aeson               (decode, encode)
-import Data.ByteString.Lazy     (toStrict, readFile, writeFile)
-import Data.Monoid              ((<>))
-import Data.Text.Lazy           (Text, unpack)
-import Data.Text.Lazy.Encoding  (encodeUtf8)
-import Network.HTTP.Simple      (httpJSON, parseRequest_, addRequestHeader,
-                                 getResponseBody)
-import Prelude hiding           (readFile, writeFile)
-import System.Directory         (doesFileExist, removeFile)
+import Control.Concurrent        (threadDelay)
+import Control.Concurrent.Async  (Async, async)
+import Control.Concurrent.MVar   (MVar, swapMVar)
+import Control.Exception         (onException)
+import Control.Monad             (forever, when, void)
+import Data.Aeson                (decode, encode)
+import Data.ByteString.Lazy      (toStrict, readFile, writeFile)
+import Data.Monoid               ((<>))
+import Data.Text.Lazy            (Text, unpack)
+import Data.Text.Lazy.Encoding   (encodeUtf8)
+import Network.HTTP.Simple       (httpJSON, parseRequest_, addRequestHeader,
+                                  getResponseBody)
+import Prelude hiding            (readFile, writeFile)
+import System.Console.Concurrent (withConcurrentOutput, outputConcurrent)
+import System.Directory          (doesFileExist, removeFile)
 
 import Config
 import Web
@@ -33,15 +34,15 @@ tagService cfg vtVar = async $ do
     case maybeTags of
       Just tags -> do
         void $ swapMVar vtVar tags
-        putStrLn $ "fetched " <> (show . length) tags <> " tags from cache"
+        outputConcurrent $ "fetched " <> (show . length) tags <> " tags from cache\n"
       Nothing   -> do
-        putStrLn "tag cache invalid, removing"
+        outputConcurrent ("tag cache invalid, removing\n" :: String)
         removeFile cacheFile
 
   forever httpLoop
 
   where
-    httpLoop = do
+    httpLoop = withConcurrentOutput $ do
       (ts, sig) <- genAPISignature . toStrict . encodeUtf8 . doorSecret $ cfg
       let initReq = parseRequest_ . unpack . doorNFCUrl $ cfg
           req'    = addRequestHeader "X-Auth-Timestamp" ts initReq
@@ -52,12 +53,12 @@ tagService cfg vtVar = async $ do
                             void $ swapMVar vtVar vts
                             return vts)
                           (do
-                            putStrLn "http error"
+                            outputConcurrent ("http error\n" :: String)
                             threadDelay 5000000
                             httpLoop)
 
-      putStrLn $ "fetched " <> (show . length) (tags :: ValidTags)
-                            <> " valid tags"
+      outputConcurrent $ "fetched " <> (show . length) (tags :: ValidTags)
+                                    <> " valid tags\n"
 
       writeFile (unpack . tagCache $ cfg) (encode tags)
 
