@@ -75,17 +75,22 @@ readerService cfg vtVar = withConcurrentOutput $ do
   where
     readerLoop dev pin rid = do
       let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
-      (_, NFC.NFCTargetISO14443a info) <- NFC.initiatorSelectPassiveTarget dev nfcMod Nothing
-      let nfcValue = LT.toUpper . LE.decodeUtf8 . BL.fromStrict . B16.encode . NFC.iso14443aAbtUid $ info
+      maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 7 10
 
-      outputConcurrent $ "[" <> LT.toStrict rid <> "] read tag: " <> LT.toStrict nfcValue <> "\n"
+      case maybeInfo of
+        Just (NFC.NFCTargetISO14443a info) -> do
+          let nfcValue = LT.toUpper . LE.decodeUtf8 . BL.fromStrict . B16.encode . NFC.iso14443aAbtUid $ info
 
-      vt <- readMVar vtVar
-      let authorized = nfcValue `elem` vt
-          logEntry   = LogEntry nfcValue authorized rid
+          outputConcurrent $ "[" <> LT.toStrict rid <> "] read tag: " <> LT.toStrict nfcValue <> "\n"
 
-      concurrently_
-        (when authorized $ cycleDoor pin $ doorHoldTime cfg)
-        (submitLogEntry cfg logEntry)
+          vt <- readMVar vtVar
+          let authorized = nfcValue `elem` vt
+              logEntry   = LogEntry nfcValue authorized rid
+
+          concurrently_
+            (when authorized $ cycleDoor pin $ doorHoldTime cfg)
+            (submitLogEntry cfg logEntry)
+
+        _ -> return ()
 
       threadDelay . (* 1000000) . fromIntegral . tagReadTTL $ cfg
