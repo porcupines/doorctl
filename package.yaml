@@ -44,6 +44,7 @@ executables:
     dependencies:
       - async
       - base <5
+      - concurrent-output
       - doorctl
       - text
     ghc-options:

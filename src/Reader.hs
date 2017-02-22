@@ -17,7 +17,7 @@ import qualified Data.Text.Lazy     as LT (unpack, toUpper, toStrict)
 import qualified Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import qualified Data.Vector        as V (toList)
 import Numeric.Natural              (Natural)
-import System.Console.Concurrent    (withConcurrentOutput, outputConcurrent)
+import System.Console.Concurrent    (outputConcurrent)
 
 import qualified Bindings.NFC       as NFC
 
@@ -33,7 +33,7 @@ unlockDoor :: PinHandle -> IO ()
 unlockDoor = flip setPin PinLow
 
 cycleDoor :: PinHandle -> Natural -> IO ()
-cycleDoor ph unlockTime = withConcurrentOutput $ do
+cycleDoor ph unlockTime = do
   unlockDoor ph
   outputConcurrent $ "[" <> show ph <> "] door unlocked\n"
 
@@ -43,7 +43,7 @@ cycleDoor ph unlockTime = withConcurrentOutput $ do
   outputConcurrent $ "[" <> show ph <> "] door locked\n"
 
 readerService :: Config -> MVar ValidTags -> IO [Async ()]
-readerService cfg vtVar = withConcurrentOutput $ do
+readerService cfg vtVar = do
   ctx <- NFC.initialize
 
   runResourceT $ do
@@ -75,13 +75,18 @@ readerService cfg vtVar = withConcurrentOutput $ do
   where
     readerLoop dev pin rid = do
       let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
-      maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 7 10
+      maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
 
       case maybeInfo of
         Just (NFC.NFCTargetISO14443a info) -> do
-          let nfcValue = LT.toUpper . LE.decodeUtf8 . BL.fromStrict . B16.encode . NFC.iso14443aAbtUid $ info
+          let nfcValue = LT.toUpper
+                       . LE.decodeUtf8
+                       . BL.fromStrict
+                       . B16.encode
+                       . NFC.iso14443aAbtUid
+                       $ info
 
-          outputConcurrent $ "[" <> LT.toStrict rid <> "] read tag: " <> LT.toStrict nfcValue <> "\n"
+          outputConcurrent $ "[" <> rid <> "] read tag: " <> nfcValue <> "\n"
 
           vt <- readMVar vtVar
           let authorized = nfcValue `elem` vt
@@ -91,6 +96,6 @@ readerService cfg vtVar = withConcurrentOutput $ do
             (when authorized $ cycleDoor pin $ doorHoldTime cfg)
             (submitLogEntry cfg logEntry)
 
-        _ -> return ()
+          threadDelay . (* 1000000) . fromIntegral . tagReadTTL $ cfg
 
-      threadDelay . (* 1000000) . fromIntegral . tagReadTTL $ cfg
+        _ -> return ()

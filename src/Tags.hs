@@ -17,7 +17,7 @@ import Data.Text.Lazy.Encoding   (encodeUtf8)
 import Network.HTTP.Simple       (httpJSON, parseRequest_, addRequestHeader,
                                   getResponseBody)
 import Prelude hiding            (readFile, writeFile)
-import System.Console.Concurrent (withConcurrentOutput, outputConcurrent)
+import System.Console.Concurrent (outputConcurrent)
 import System.Directory          (doesFileExist, removeFile)
 
 import Config
@@ -42,7 +42,7 @@ tagService cfg vtVar = async $ do
   forever httpLoop
 
   where
-    httpLoop = withConcurrentOutput $ do
+    httpLoop = do
       (ts, sig) <- genAPISignature . toStrict . encodeUtf8 . doorSecret $ cfg
       let initReq = parseRequest_ . unpack . doorNFCUrl $ cfg
           req'    = addRequestHeader "X-Auth-Timestamp" ts initReq
