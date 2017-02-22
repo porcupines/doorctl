@@ -10,6 +10,7 @@ import Control.Monad.Trans.Resource (runResourceT, resourceForkWith,
                                      allocate)
 import qualified Data.ByteString.Lazy as BL (fromStrict)
 import qualified Data.ByteString.Base16 as B16 (encode)
+import Data.IORef                   (IORef, newIORef, atomicModifyIORef')
 import Data.List                    (nub)
 import Data.Maybe                   (fromMaybe)
 import Data.Monoid                  ((<>))
@@ -25,6 +26,7 @@ import Config
 import GPIO
 import Log
 import Tags
+import Watchdog
 
 lockDoor :: PinHandle -> IO ()
 lockDoor = flip setPin PinHigh
@@ -41,6 +43,11 @@ cycleDoor ph unlockTime = do
 
   lockDoor ph
   outputConcurrent $ "[" <> show ph <> "] door locked\n"
+
+resetCountdown :: Config -> IORef Countdown -> IO ()
+resetCountdown cfg countdownRef = do
+  let newValue = fromIntegral . watchdogCount $ cfg
+  atomicModifyIORef' countdownRef $ const (newValue, ())
 
 readerService :: Config -> MVar ValidTags -> IO [Async ()]
 readerService cfg vtVar = do
@@ -61,6 +68,10 @@ readerService cfg vtVar = do
       return (pinNum, allocatedPin)
 
     forM (V.toList . readers $ cfg) $ \r -> resourceForkWith async . liftIO $ do
+      -- Start the watchdog service before doing anything else
+      countdownRef <- newIORef . fromIntegral . watchdogCount $ cfg
+      void $ watchdogService cfg (readerId r) countdownRef
+
       outputConcurrent $ "[" <> (LT.toStrict . readerId) r <> "] opening reader\n"
       -- Open the reader device and set it to initiator mode.
       maybeDev <- NFC.open ctx $ (LT.unpack . readerDev) r
@@ -70,12 +81,14 @@ readerService cfg vtVar = do
       let pin = fromMaybe (error "couldn't find pin in allocatedPinMap")
                           (lookup (actuatorPin r) allocatedPinMap)
 
-      forever $ readerLoop dev pin (readerId r)
+      forever $ readerLoop dev pin (readerId r) countdownRef
 
   where
-    readerLoop dev pin rid = do
+    readerLoop dev pin rid countdownRef = do
       let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
       maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
+
+      resetCountdown cfg countdownRef
 
       case maybeInfo of
         Just (NFC.NFCTargetISO14443a info) -> do

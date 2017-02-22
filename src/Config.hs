@@ -22,6 +22,8 @@ data Config =
          , doorHoldTime   :: Natural
          , tagReadTTL     :: Natural
          , tagCache       :: Text
+         , watchdogCount  :: Natural
+         , watchdogPeriod :: Natural
          , readers        :: Vector Reader
          } deriving (Generic, Show)
 
