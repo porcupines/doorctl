@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ForeignFunctionInterface #-}
 module Watchdog where
 
 import Control.Concurrent        (threadDelay)
@@ -11,6 +10,7 @@ import Data.Text.Lazy            (Text)
 import System.Console.Concurrent (outputConcurrent)
 
 import Config
+import Exit
 
 type Countdown = Int
 
@@ -23,5 +23,3 @@ watchdogService cfg name countdownRef = async . forever $ do
     c_exit 1
 
   threadDelay . (* 1000000) . fromIntegral . watchdogPeriod $ cfg
-
-foreign import ccall "stdlib.h exit" c_exit :: Int -> IO ()

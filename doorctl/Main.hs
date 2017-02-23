@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Concurrent.Async  (waitAnyCatch)
+import Control.Concurrent.Async  (waitAnyCatchCancel)
 import Control.Concurrent.MVar   (newMVar)
 import Data.Monoid               ((<>))
 import Data.Text.Lazy            (pack)
@@ -9,6 +9,7 @@ import System.Environment        (getArgs)
 import System.IO                 (BufferMode(..), stdout, hSetBuffering)
 
 import Config
+import Exit
 import Reader
 import Tags
 
@@ -23,7 +24,7 @@ main = withConcurrentOutput $ do
   tagThread     <- tagService config vtVar
   readerThreads <- readerService config vtVar
 
-  (a, r) <- waitAnyCatch $ tagThread : readerThreads
+  (a, r) <- waitAnyCatchCancel $ tagThread : readerThreads
   let threadThatExited = if a == tagThread
                            then "tag"
                            else "reader"
@@ -31,7 +32,9 @@ main = withConcurrentOutput $ do
   case r of
     Right _ -> outputConcurrent $ "the " <> threadThatExited
                                          <> " thread has exited successfully\n"
-    Left ex -> outputConcurrent $ "the " <> threadThatExited
-                                         <> " thread has thrown an exception: "
-                                         <> show ex
-                                         <> "\n"
+    Left ex -> do
+      outputConcurrent $ "the " <> threadThatExited
+                                <> " thread has thrown an exception: "
+                                <> show ex
+                                <> "\n"
+      c_exit 1
