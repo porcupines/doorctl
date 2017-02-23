@@ -12,6 +12,7 @@ data Reader =
   Reader { readerId    :: Text
          , readerDev   :: Text
          , actuatorPin :: Natural
+         , guestAccess :: Bool
          } deriving (Generic, Show)
 
 data Config =
@@ -24,6 +25,7 @@ data Config =
          , tagCache       :: Text
          , watchdogCount  :: Natural
          , watchdogPeriod :: Natural
+         , guestNFCValues :: Vector Text
          , readers        :: Vector Reader
          } deriving (Generic, Show)
 

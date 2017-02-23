@@ -73,6 +73,7 @@ readerService cfg vtVar = do
       void $ watchdogService cfg (readerId r) countdownRef
 
       outputConcurrent $ "[" <> (LT.toStrict . readerId) r <> "] opening reader\n"
+
       -- Open the reader device and set it to initiator mode.
       maybeDev <- NFC.open ctx $ (LT.unpack . readerDev) r
       let dev = fromMaybe (error "error opening device") maybeDev
@@ -81,10 +82,10 @@ readerService cfg vtVar = do
       let pin = fromMaybe (error "couldn't find pin in allocatedPinMap")
                           (lookup (actuatorPin r) allocatedPinMap)
 
-      forever $ readerLoop dev pin (readerId r) countdownRef
+      forever $ readerLoop dev pin r countdownRef
 
   where
-    readerLoop dev pin rid countdownRef = do
+    readerLoop dev pin reader countdownRef = do
       let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
       maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
 
@@ -99,11 +100,12 @@ readerService cfg vtVar = do
                        . NFC.iso14443aAbtUid
                        $ info
 
-          outputConcurrent $ "[" <> rid <> "] read tag: " <> nfcValue <> "\n"
+          outputConcurrent $ "[" <> readerId reader <> "] read tag: " <> nfcValue <> "\n"
 
           vt <- readMVar vtVar
-          let authorized = nfcValue `elem` vt
-              logEntry   = LogEntry nfcValue authorized rid
+          let authorized = nfcValue `elem` vt ||
+                           (guestAccess reader && nfcValue `elem` (V.toList . guestNFCValues $ cfg))
+              logEntry   = LogEntry nfcValue authorized (readerId reader)
 
           concurrently_
             (when authorized $ cycleDoor pin $ doorHoldTime cfg)
