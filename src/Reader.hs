@@ -2,7 +2,7 @@
 module Reader where
 
 import Control.Concurrent           (threadDelay)
-import Control.Concurrent.Async     (Async, async, concurrently_)
+import Control.Concurrent.Async     (Async, async)
 import Control.Concurrent.MVar      (MVar, readMVar)
 import Control.Monad                (forever, void, forM, when)
 import Control.Monad.IO.Class       (liftIO)
@@ -107,9 +107,9 @@ readerService cfg vtVar = do
                            (guestAccess reader && nfcValue `elem` (V.toList . guestNFCValues $ cfg))
               logEntry   = LogEntry nfcValue authorized (readerId reader)
 
-          concurrently_
-            (when authorized $ cycleDoor pin $ doorHoldTime cfg)
-            (submitLogEntry cfg logEntry)
+          when authorized $ cycleDoor pin $ doorHoldTime cfg
+
+          submitLogEntry cfg logEntry -- forkIO called in here
 
           threadDelay . (* 1000000) . fromIntegral . tagReadTTL $ cfg
 

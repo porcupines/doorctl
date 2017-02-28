@@ -4,6 +4,8 @@ module Log
   , submitLogEntry
   ) where
 
+import Control.Concurrent      (forkIO, threadDelay)
+import Control.Exception       (onException)
 import Control.Monad           (void)
 import Data.Aeson              (ToJSON(..), (.=), object)
 import Data.ByteString.Lazy    (toStrict)
@@ -29,11 +31,15 @@ instance ToJSON LogEntry where
                      ]
 
 submitLogEntry :: Config -> LogEntry -> IO ()
-submitLogEntry cfg le = do
-  (ts, sig)   <- genAPISignature . toStrict . encodeUtf8 . doorSecret $ cfg
-  let initReq = parseRequest_ $ "POST " <> (unpack . doorLogUrl) cfg
-      req''   = addRequestHeader "X-Auth-Timestamp" ts initReq
-      req'    = addRequestHeader "X-Auth-Signature" sig req''
-      req     = setRequestBodyJSON le req'
+submitLogEntry cfg le = void . forkIO $ go
+  where
+    go = onException
+      (do
+        (ts, sig)   <- genAPISignature . toStrict . encodeUtf8 . doorSecret $ cfg
+        let initReq = parseRequest_ $ "POST " <> (unpack . doorLogUrl) cfg
+            req''   = addRequestHeader "X-Auth-Timestamp" ts initReq
+            req'    = addRequestHeader "X-Auth-Signature" sig req''
+            req     = setRequestBodyJSON le req'
 
-  void . httpLBS $ req
+        void . httpLBS $ req)
+      (threadDelay (5 * 1000000) >> go)
