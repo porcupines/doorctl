@@ -19,6 +19,7 @@ import qualified Data.Text.Lazy.Encoding as LE (decodeUtf8)
 import qualified Data.Vector        as V (toList)
 import Numeric.Natural              (Natural)
 import System.Console.Concurrent    (outputConcurrent)
+import System.Posix                 (epochTime)
 
 import qualified Bindings.NFC       as NFC
 
@@ -100,12 +101,14 @@ readerService cfg vtVar = do
                        . NFC.iso14443aAbtUid
                        $ info
 
+          ts <- epochTime
+
           outputConcurrent $ "[" <> readerId reader <> "] read tag: " <> nfcValue <> "\n"
 
           vt <- readMVar vtVar
           let authorized = nfcValue `elem` vt ||
                            (guestAccess reader && nfcValue `elem` (V.toList . guestNFCValues $ cfg))
-              logEntry   = LogEntry nfcValue authorized (readerId reader)
+              logEntry   = LogEntry nfcValue authorized (readerId reader) ts
 
           when authorized $ cycleDoor pin $ doorHoldTime cfg
 
