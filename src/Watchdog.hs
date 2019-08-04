@@ -6,7 +6,7 @@ import Control.Concurrent.Async  (Async, async)
 import Control.Monad             (forever, when)
 import Data.IORef                (IORef, atomicModifyIORef')
 import Data.Monoid               ((<>))
-import Data.Text.Lazy            (Text)
+import Data.Text                 (Text)
 import System.Console.Concurrent (outputConcurrent)
 
 import Config

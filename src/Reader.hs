@@ -8,14 +8,13 @@ import Control.Monad                (forever, void, forM, when)
 import Control.Monad.IO.Class       (liftIO)
 import Control.Monad.Trans.Resource (runResourceT, resourceForkWith,
                                      allocate)
-import qualified Data.ByteString.Lazy as BL (fromStrict)
 import qualified Data.ByteString.Base16 as B16 (encode)
 import Data.IORef                   (IORef, newIORef, atomicModifyIORef')
 import Data.List                    (nub)
 import Data.Maybe                   (fromMaybe)
 import Data.Monoid                  ((<>))
-import qualified Data.Text.Lazy     as LT (unpack, toUpper, toStrict)
-import qualified Data.Text.Lazy.Encoding as LE (decodeUtf8)
+import Data.Text                    (unpack, toUpper)
+import Data.Text.Encoding           (decodeUtf8)
 import qualified Data.Vector        as V (toList)
 import Numeric.Natural              (Natural)
 import System.Console.Concurrent    (outputConcurrent)
@@ -73,10 +72,10 @@ readerService cfg vtVar = do
       countdownRef <- newIORef . fromIntegral . watchdogCount $ cfg
       void $ watchdogService cfg (readerId r) countdownRef
 
-      outputConcurrent $ "[" <> (LT.toStrict . readerId) r <> "] opening reader\n"
+      outputConcurrent $ "[" <> readerId r <> "] opening reader\n"
 
       -- Open the reader device and set it to initiator mode.
-      maybeDev <- NFC.open ctx $ (LT.unpack . readerDev) r
+      maybeDev <- NFC.open ctx $ (unpack . readerDev) r
       let dev = fromMaybe (error "error opening device") maybeDev
       void . NFC.initiatorInit $ dev
 
@@ -94,9 +93,8 @@ readerService cfg vtVar = do
 
       case maybeInfo of
         Just (NFC.NFCTargetISO14443a info) -> do
-          let nfcValue = LT.toUpper
-                       . LE.decodeUtf8
-                       . BL.fromStrict
+          let nfcValue = toUpper
+                       . decodeUtf8
                        . B16.encode
                        . NFC.iso14443aAbtUid
                        $ info

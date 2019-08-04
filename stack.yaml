@@ -1,9 +1,7 @@
-resolver: lts-8.5
+resolver: lts-12.26
 packages:
-  - location: '.'
+  - '.'
 extra-deps:
-  - dhall-1.1.0
   - nfc-0.1.0
-  - resourcet-1.1.9
 flags: {}
 extra-package-dbs: []

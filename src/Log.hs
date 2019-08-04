@@ -4,18 +4,17 @@ module Log
   , submitLogEntry
   ) where
 
-import Control.Concurrent      (forkIO, threadDelay)
-import Control.Exception       (onException)
-import Control.Monad           (void)
-import Data.Aeson              (ToJSON(..), (.=), object)
-import Data.ByteString.Lazy    (toStrict)
-import Data.Monoid             ((<>))
-import Data.Text.Lazy          (Text, unpack)
-import Data.Text.Lazy.Encoding (encodeUtf8)
-import Foreign.C.Types         (CTime(..))
-import Network.HTTP.Simple     (parseRequest_, addRequestHeader, setRequestBodyJSON,
-                                httpLBS)
-import System.Posix            (EpochTime)
+import Control.Concurrent  (forkIO, threadDelay)
+import Control.Exception   (onException)
+import Control.Monad       (void)
+import Data.Aeson          (ToJSON(..), (.=), object)
+import Data.Monoid         ((<>))
+import Data.Text           (Text, unpack)
+import Data.Text.Encoding  (encodeUtf8)
+import Foreign.C.Types     (CTime(..))
+import Network.HTTP.Simple (parseRequest_, addRequestHeader, setRequestBodyJSON,
+                            httpLBS)
+import System.Posix        (EpochTime)
 
 import Config
 import Web
@@ -42,7 +41,7 @@ submitLogEntry cfg le = void . forkIO $ go
   where
     go = onException
       (do
-        (ts, sig)   <- genAPISignature . toStrict . encodeUtf8 . doorSecret $ cfg
+        (ts, sig)   <- genAPISignature . encodeUtf8 . doorSecret $ cfg
         let initReq = parseRequest_ $ "POST " <> (unpack . doorLogUrl) cfg
             req''   = addRequestHeader "X-Auth-Timestamp" ts initReq
             req'    = addRequestHeader "X-Auth-Signature" sig req''

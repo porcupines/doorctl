@@ -3,7 +3,7 @@ module Main where
 import Control.Concurrent.Async  (waitAnyCatchCancel)
 import Control.Concurrent.MVar   (newMVar)
 import Data.Monoid               ((<>))
-import Data.Text.Lazy            (pack)
+import Data.Text                 (pack)
 import System.Console.Concurrent (withConcurrentOutput, outputConcurrent)
 import System.Environment        (getArgs)
 import System.IO                 (BufferMode(..), stdout, hSetBuffering)
