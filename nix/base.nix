@@ -33,7 +33,7 @@ let
 
 
       # Get some utilities
-      inherit (import (shpadoinkle + "/nix/util.nix") { inherit compiler isJS pkgs; }) compilerjs doCannibalize;
+      util = import (shpadoinkle + "/nix/util.nix") { inherit compiler isJS pkgs; };
 
 
       # Build faster by doing less
@@ -44,6 +44,17 @@ let
       });
 
 
+     gitignore = util.gitignore
+       [ ".git"
+         "*.ghc*"
+         "*result*"
+         "*dist*"
+         "*.nix"
+         "*.md"
+       ];
+
+
+
       # Overlay containing Shpadoinkle packages, and needed alterations for those packages
       # as well as optimizations from Reflex Platform
       shpadoinkle-overlay =
@@ -51,8 +62,17 @@ let
 
 
       # Haskell specific overlay (for you to extend)
-      haskell-overlay = hself: hsuper: {
-        "nfc" = hself.callCabal2nix "nfc" nfc-src {};
+      haskell-overlay = pkgs: hself: hsuper: {
+         "nfc" = with pkgs.haskell.lib; overrideCabal
+           (appendConfigureFlags
+             (hself.callCabal2nix "nfc" nfc-src {
+               nfc = pkgs.libnfc;
+             })
+             [ "--extra-include-dirs=${pkgs.libnfc.outPath}/include"
+               "--extra-lib-dirs=${pkgs.libnfc.outPath}/lib"
+             ]
+           )
+           (drv: {});
       };
 
 
@@ -60,8 +80,8 @@ let
       doorctl-overlay = self: super: {
         haskell = super.haskell //
           { packages = super.haskell.packages //
-            { ${compilerjs} = super.haskell.packages.${compilerjs}.override (old: {
-                overrides = super.lib.composeExtensions (old.overrides or (_: _: {})) haskell-overlay;
+            { ${compiler} = super.haskell.packages.${compiler}.override (old: {
+                overrides = super.lib.composeExtensions (old.overrides or (_: _: {})) (haskell-overlay self);
               });
             };
           };
@@ -84,7 +104,8 @@ let
       ghcTools = with pkgs.haskell.packages.${compiler};
         [ cabal-install
           ghcid
-        ] ++ (if isJS then [] else [ stylish-haskell ]);
+          stylish-haskell
+        ];
 
 
       # We can name him George
@@ -94,7 +115,7 @@ let
           l = pkgs.lib;
           source = ../.;
         in
-        pkgs.haskell.packages.${compilerjs}.callCabal2nix x
+        pkgs.haskell.packages.${compiler}.callCabal2nix x
           (filterSource
              (path: type:
                 let
@@ -117,10 +138,10 @@ let
       { build = chill doorctl;
 
         shell =
-          pkgs.haskell.packages.${compilerjs}.shellFor {
+          pkgs.haskell.packages.${compiler}.shellFor {
             inherit withHoogle;
             packages    = _: [ doorctl ];
-            COMPILER    = compilerjs;
+            COMPILER    = compiler;
             buildInputs = ghcTools;
             shellHook   = ''
               ${lolcat}/bin/lolcat ${../figlet}
