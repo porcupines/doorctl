@@ -1,0 +1,71 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.4.
+--
+-- see: https://github.com/sol/hpack
+
+name:           doorctl
+version:        0.0.0
+synopsis:       doorctl provides card access control
+description:    doorctl provides card access control
+category:       Other
+maintainer:     John Galt <jgalt@centromere.net>
+license:        PublicDomain
+build-type:     Simple
+extra-source-files:
+    CHANGELOG.md
+    package.yaml
+    README.md
+    stack.yaml
+
+library
+  exposed-modules:
+      Config
+      Exit
+      Reader
+      Tags
+  other-modules:
+      GPIO
+      Log
+      Watchdog
+      Web
+      Paths_doorctl
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      aeson
+    , async
+    , base <5
+    , base16-bytestring
+    , base64-bytestring
+    , bytestring
+    , concurrent-output
+    , cryptonite
+    , dhall
+    , directory
+    , http-conduit
+    , lifted-base
+    , memory
+    , monad-control
+    , nfc
+    , resourcet >=1.1.9
+    , text
+    , unix
+    , vector
+  default-language: Haskell2010
+
+executable doorctl
+  main-is: Main.hs
+  other-modules:
+      Paths_doorctl
+  hs-source-dirs:
+      doorctl
+  ghc-options: -Wall -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      async
+    , base <5
+    , concurrent-output
+    , doorctl
+    , text
+  default-language: Haskell2010
