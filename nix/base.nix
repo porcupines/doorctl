@@ -25,6 +25,13 @@ let
       };
 
 
+      nfc-src = builtins.fetchGit {
+        url    = https://github.com/centromere/nfc.git;
+        ref    = "master";
+        rev    = "7a3bed84242e23b42d53ecd2efe9f8b1a2bfdea8";
+      };
+
+
       # Get some utilities
       inherit (import (shpadoinkle + "/nix/util.nix") { inherit compiler isJS pkgs; }) compilerjs doCannibalize;
 
@@ -45,7 +52,7 @@ let
 
       # Haskell specific overlay (for you to extend)
       haskell-overlay = hself: hsuper: {
-        "happy" = pkgs.haskell.lib.dontCheck hsuper.happy;
+        "nfc" = hself.callCabal2nix "nfc" nfc-src {};
       };
 
 
@@ -68,6 +75,7 @@ let
         }) {
         inherit system;
         overlays = [
+          shpadoinkle-overlay
           doorctl-overlay
         ];
       };
