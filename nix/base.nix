@@ -121,7 +121,7 @@ let
                 let
                   relative = replaceStrings [(toString source + "/")] [""] path;
                 in
-                (l.hasPrefix "src" relative || l.hasPrefix "api" relative || l.hasPrefix "ui" relative) && type == "directory"
+                (l.hasPrefix "src" relative || l.hasPrefix "doorctl" relative) && type == "directory"
                 || l.hasSuffix ".hs" path
                 || l.hasSuffix ".cabal" path
              )
