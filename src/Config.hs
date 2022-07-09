@@ -6,7 +6,6 @@ module Config
   ) where
 
 import Dhall
-import GHC.Generics (Generic)
 
 data Reader =
   Reader { readerId    :: Text

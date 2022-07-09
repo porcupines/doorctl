@@ -39,7 +39,7 @@ library
     Watchdog
     Web
 
-  ghc-options: -Wall
+  ghc-options: -Wall -Werror
 
 
 executable doorctl
@@ -72,6 +72,7 @@ executable doorctl
 
   ghc-options:
     -Wall
+    -Werror
     -rtsopts
     -threaded
     -with-rtsopts=-N
