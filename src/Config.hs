@@ -29,8 +29,8 @@ data Config =
          , readers        :: Vector Reader
          } deriving (Generic, Show)
 
-instance Interpret Reader
-instance Interpret Config
+instance FromDhall Reader
+instance FromDhall Config
 
 loadConfig :: Text -> IO Config
 loadConfig = input auto
