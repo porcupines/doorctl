@@ -1,0 +1,93 @@
+{
+  "nodes": {
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1656928814,
+        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flake-utils_2": {
+      "locked": {
+        "lastModified": 1656928814,
+        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "haskell-nfc": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1657406310,
+        "narHash": "sha256-5ZHmtP6H7e0ezya2dKCc5B4J0+D4fOB/qiTK9Ovk6qM=",
+        "owner": "morganthomas",
+        "repo": "nfc",
+        "rev": "bbeadc2e45a273d85a6c934284d96df5d8f2c842",
+        "type": "github"
+      },
+      "original": {
+        "owner": "morganthomas",
+        "ref": "nix-flake",
+        "repo": "nfc",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1657401244,
+        "narHash": "sha256-4EGGDF1Hk3RZVIBcE7Ral46RWqBSuJVVdlelslUaOlE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "796b4aaa0b98be26074ebc6794c6fdc97816d58c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1657406306,
+        "narHash": "sha256-NM/mHC7wot9rsFaXI6huBqSN8sy9K0lySfTOxht2svQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "0b0281e0908bde5d01685c822786a537de75e59c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "haskell-nfc": "haskell-nfc",
+        "nixpkgs": "nixpkgs_2"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

@@ -7,7 +7,6 @@ module GPIO
   ) where 
 
 import Control.Monad    (when, unless)
-import Data.Monoid      ((<>))
 import Numeric.Natural  (Natural)
 import System.Directory (doesDirectoryExist)
 
