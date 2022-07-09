@@ -24,17 +24,31 @@
         haskellPackages = pkgs.haskellPackages;
 
         packageName = "doorctl";
+
+        t = pkgs.lib.trivial;
+        hl = pkgs.haskell.lib;
+
+        project = devTools:
+          let addBuildTools = (t.flip hl.addBuildTools) devTools;
+          in haskellPackages.developPackage {
+            root = ./.;
+            name = packageName;
+            returnShellEnv = !(devTools == [ ]);
+            modifier = (t.flip t.pipe) [
+              addBuildTools
+              hl.dontHaddock
+              hl.disableLibraryProfiling
+              hl.disableExecutableProfiling
+            ];
+          };
       in {
-        packages.${packageName} = haskellPackages.callCabal2nix packageName ./. {};
+        packages.${packageName} = project [ ];
 
         defaultPackage = self.packages.${system}.${packageName};
 
-        devShell = pkgs.mkShell {
-          buildInputs = with pkgs; [
-            ghcid
-            cabal-install
-          ];
-          inputsFrom = builtins.attrValues self.packages.${system};
-        };
+        devShell = project (with pkgs; [
+          ghcid
+          cabal-install
+        ]);
       });
 }
