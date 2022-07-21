@@ -2,8 +2,6 @@
   description = "doorctl";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
-    flake-utils.url = "github:numtide/flake-utils";
     haskell-nfc.url = "github:morganthomas/nfc/add-nix-flake";
   };
 
