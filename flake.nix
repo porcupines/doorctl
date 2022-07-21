@@ -2,7 +2,7 @@
   description = "doorctl";
 
   inputs = {
-    nfc.url = "github:morganthomas/nfc/add-nix-flake";
+    nfc.url = "github:centromere/nfc";
   };
 
   outputs = { self, nixpkgs, flake-utils, nfc }:
