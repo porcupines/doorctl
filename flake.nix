@@ -2,17 +2,17 @@
   description = "doorctl";
 
   inputs = {
-    haskell-nfc.url = "github:morganthomas/nfc/add-nix-flake";
+    nfc.url = "github:morganthomas/nfc/add-nix-flake";
   };
 
-  outputs = { self, nixpkgs, flake-utils, haskell-nfc }:
+  outputs = { self, nixpkgs, flake-utils, nfc }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         overlay = self: super:
           {
             haskellPackages = super.haskellPackages.override ({
               overrides = hsSelf: hsSuper: {
-                nfc = haskell-nfc.packages.${system}.nfc;
+                nfc = nfc.packages.${system}.nfc;
               };
             });
           };

@@ -28,7 +28,7 @@
         "type": "indirect"
       }
     },
-    "haskell-nfc": {
+    "nfc": {
       "inputs": {
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs"
@@ -79,7 +79,7 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "haskell-nfc": "haskell-nfc",
+        "nfc": "nfc",
         "nixpkgs": "nixpkgs_2"
       }
     }
