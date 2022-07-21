@@ -1,7 +1,0 @@
-resolver: lts-12.26
-packages:
-  - '.'
-extra-deps:
-  - nfc-0.1.0
-flags: {}
-extra-package-dbs: []

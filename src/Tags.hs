@@ -11,7 +11,6 @@ import Control.Exception         (onException)
 import Control.Monad             (forever, when, void)
 import Data.Aeson                (decode, encode)
 import Data.ByteString.Lazy      (readFile, writeFile)
-import Data.Monoid               ((<>))
 import Data.Text                 (Text, unpack)
 import Data.Text.Encoding        (encodeUtf8)
 import Network.HTTP.Simple       (httpJSON, parseRequest_, addRequestHeader,

@@ -6,7 +6,6 @@ module Config
   ) where
 
 import Dhall
-import GHC.Generics (Generic)
 
 data Reader =
   Reader { readerId    :: Text
@@ -29,8 +28,8 @@ data Config =
          , readers        :: Vector Reader
          } deriving (Generic, Show)
 
-instance Interpret Reader
-instance Interpret Config
+instance FromDhall Reader
+instance FromDhall Config
 
 loadConfig :: Text -> IO Config
 loadConfig = input auto

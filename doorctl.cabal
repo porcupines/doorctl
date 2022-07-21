@@ -1,0 +1,78 @@
+cabal-version: 2.4
+name: doorctl
+version: 0.1.0.0
+
+
+library
+  build-depends:
+      aeson
+    , async
+    , base <5
+    , base64-bytestring
+    , base16-bytestring
+    , bytestring
+    , concurrent-output
+    , cryptonite
+    , directory
+    , dhall
+    , http-conduit
+    , lifted-base
+    , nfc
+    , memory
+    , monad-control
+    , resourcet >= 1.1.9
+    , text
+    , unix
+    , vector
+
+  hs-source-dirs: src
+
+  exposed-modules:
+    Config
+    Exit
+    Reader
+    Tags
+
+  other-modules:
+    GPIO
+    Log
+    Watchdog
+    Web
+
+  ghc-options: -Wall -Werror
+
+
+executable doorctl
+  build-depends:
+      aeson
+    , async
+    , base <5
+    , base64-bytestring
+    , base16-bytestring
+    , bytestring
+    , concurrent-output
+    , cryptonite
+    , directory
+    , dhall
+    , http-conduit
+    , lifted-base
+    , nfc
+    , memory
+    , monad-control
+    , resourcet >= 1.1.9
+    , text
+    , unix
+    , vector
+
+    , doorctl
+
+  hs-source-dirs: doorctl
+
+  main-is: Main.hs
+
+  ghc-options:
+    -Wall
+    -Werror
+    -rtsopts
+    -threaded
+    -with-rtsopts=-N
