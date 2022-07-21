@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
-    haskell-nfc.url = "github:morganthomas/nfc/nix-flake";
+    haskell-nfc.url = "github:morganthomas/nfc/add-nix-flake";
   };
 
   outputs = { self, nixpkgs, flake-utils, haskell-nfc }:
@@ -14,7 +14,7 @@
           {
             haskellPackages = super.haskellPackages.override ({
               overrides = hsSelf: hsSuper: {
-                haskell-nfc = haskell-nfc.packages.${system}.haskell-nfc;
+                nfc = haskell-nfc.packages.${system}.nfc;
               };
             });
           };

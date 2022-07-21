@@ -17,7 +17,7 @@ library
     , dhall
     , http-conduit
     , lifted-base
-    , haskell-nfc
+    , nfc
     , memory
     , monad-control
     , resourcet >= 1.1.9
@@ -56,7 +56,7 @@ executable doorctl
     , dhall
     , http-conduit
     , lifted-base
-    , haskell-nfc
+    , nfc
     , memory
     , monad-control
     , resourcet >= 1.1.9
