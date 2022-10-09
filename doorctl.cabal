@@ -13,6 +13,7 @@ library
     , bytestring
     , concurrent-output
     , cryptonite
+    , doorctl-api
     , directory
     , dhall
     , http-conduit
