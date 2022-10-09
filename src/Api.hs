@@ -22,12 +22,13 @@ logAccessAttempt
   -> UTCTime
   -> AccessAttemptResult
   -> NFCKey
+  -> Signature
   -> IO ()
-logAccessAttempt config time result key = do
+logAccessAttempt config time result key signature = do
   env <- accessAttemptClientEnv config
   res <- runClientM
     (client (Proxy @LogAccessAttemptAPI)
-      time result key)
+      time result key signature)
     env
   case res of
     Right _ -> pure ()
@@ -44,7 +45,8 @@ accessAttemptClientEnv cfg = do
     $ parseBaseUrl (unpack (doorLogUrl cfg))
 
 
-fetchNFCKeys :: Config -> UTCTime -> Signature -> IO NFCKeys
+fetchNFCKeys
+  :: Config -> UTCTime -> Signature -> IO NFCKeys
 fetchNFCKeys cfg time signature = do
   env <- fetchNFCKeysClientEnv cfg
   res <- runClientM
