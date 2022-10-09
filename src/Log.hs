@@ -8,15 +8,16 @@ import Control.Concurrent  (forkIO, threadDelay)
 import Control.Exception   (onException)
 import Control.Monad       (void)
 import Data.Aeson          (ToJSON(..), (.=), object)
-import Data.Text           (Text, unpack)
-import Data.Text.Encoding  (encodeUtf8)
+import Data.Text           (Text)
+import Data.Time.Clock (UTCTime)
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Foreign.C.Types     (CTime(..))
-import Network.HTTP.Simple (parseRequest_, addRequestHeader, setRequestBodyJSON,
-                            httpLBS)
 import System.Posix        (EpochTime)
 
+import DoorctlAPI (AccessAttemptResult (AccessGranted, AccessNotGranted), NFCKey (..))
+
+import Api (logAccessAttempt)
 import Config
-import Web
 
 data LogEntry =
   LogEntry { leNfcValue :: Text
@@ -35,17 +36,18 @@ instance ToJSON LogEntry where
 epochToInt :: EpochTime -> Int
 epochToInt (CTime t) = fromIntegral t
 
+epochTimeToUTCTime :: EpochTime -> UTCTime
+epochTimeToUTCTime =
+  posixSecondsToUTCTime . fromIntegral . fromEnum
+
 submitLogEntry :: Config -> LogEntry -> IO ()
 submitLogEntry cfg le = void . forkIO $ go
   where
     go = onException
-      (do
-        (ts, sig)   <- genAPISignature . encodeUtf8 . doorSecret $ cfg
-        let initReq = parseRequest_ $ "POST " <> (unpack . doorLogUrl) cfg
-            req''   = addRequestHeader "X-Auth-Timestamp" ts initReq
-            req'    = addRequestHeader "X-Auth-Signature" sig req''
-            req     = setRequestBodyJSON le req'
-
-        void . httpLBS $ req)
+      (logAccessAttempt cfg
+        (epochTimeToUTCTime (leLoggedAt le))
+        (if leGranted le then AccessGranted
+         else AccessNotGranted)
+        (NFCKey (leNfcValue le)))
 
       (threadDelay (5 * 1000000) >> go)
