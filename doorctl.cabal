@@ -16,13 +16,16 @@ library
     , doorctl-api
     , directory
     , dhall
+    , http-client
     , http-conduit
     , lifted-base
     , nfc
     , memory
     , monad-control
     , resourcet >= 1.1.9
+    , servant-client
     , text
+    , time
     , unix
     , vector
 
@@ -35,6 +38,7 @@ library
     Tags
 
   other-modules:
+    Api
     GPIO
     Log
     Watchdog
