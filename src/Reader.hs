@@ -12,7 +12,7 @@ import qualified Data.ByteString.Base16 as B16 (encode)
 import Data.IORef                   (IORef, newIORef, atomicModifyIORef')
 import Data.List                    (nub)
 import Data.Maybe                   (fromMaybe)
-import Data.Text                    (unpack, toUpper)
+import Data.Text                    (toUpper)
 import Data.Text.Encoding           (decodeUtf8)
 import qualified Data.Vector        as V (toList)
 import Numeric.Natural              (Natural)
@@ -28,10 +28,10 @@ import Tags
 import Watchdog
 
 lockDoor :: PinHandle -> IO ()
-lockDoor = flip setPin PinHigh
+lockDoor _ = putStrLn "lock door"
 
 unlockDoor :: PinHandle -> IO ()
-unlockDoor = flip setPin PinLow
+unlockDoor _ =  putStrLn "unlock door"
 
 cycleDoor :: PinHandle -> Natural -> IO ()
 cycleDoor ph unlockTime = do
@@ -50,7 +50,8 @@ resetCountdown cfg countdownRef = do
 
 readerService :: Config -> MVar ValidTags -> IO [Async ()]
 readerService cfg vtVar = do
-  ctx <- NFC.initialize
+  putStrLn "initialize NFC"
+  -- ctx <- NFC.initialize
 
   runResourceT $ do
     -- A single door may be controlled by multiple readers. We must only
@@ -74,9 +75,11 @@ readerService cfg vtVar = do
       outputConcurrent $ "[" <> readerId r <> "] opening reader\n"
 
       -- Open the reader device and set it to initiator mode.
-      maybeDev <- NFC.open ctx $ (unpack . readerDev) r
-      let dev = fromMaybe (error "error opening device") maybeDev
-      void . NFC.initiatorInit $ dev
+      putStrLn "Open NFC reader"
+      -- maybeDev <- NFC.open ctx $ (unpack . readerDev) r
+      -- let dev = fromMaybe (error "error opening device") maybeDev
+      let dev = error "no device in test mode"
+      -- void . NFC.initiatorInit $ dev
 
       let pin = fromMaybe (error "couldn't find pin in allocatedPinMap")
                           (lookup (actuatorPin r) allocatedPinMap)
@@ -84,9 +87,11 @@ readerService cfg vtVar = do
       forever $ readerLoop dev pin r countdownRef
 
   where
-    readerLoop dev pin reader countdownRef = do
-      let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
-      maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
+    readerLoop _dev pin reader countdownRef = do
+      putStrLn "Initiator poll target"
+      -- let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
+      -- maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
+      let maybeInfo = Just (error "no info")
 
       resetCountdown cfg countdownRef
 

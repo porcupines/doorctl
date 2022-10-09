@@ -6,9 +6,7 @@ module GPIO
   , freePin
   ) where 
 
-import Control.Monad    (when, unless)
 import Numeric.Natural  (Natural)
-import System.Directory (doesDirectoryExist)
 
 newtype PinHandle = PinHandle { pinHandle :: Natural }
 
@@ -30,14 +28,16 @@ setPin ph ps = writeFile (pinPath ph <> "/value") $ show ps
 allocPin :: Natural -> IO PinHandle
 allocPin p = do
   let ph = PinHandle p
-  pinExported <- doesDirectoryExist . pinPath $ ph
-  unless pinExported $
-    writeFile "/sys/class/gpio/export" $ show p
-  writeFile (pinPath ph <> "/direction") "out"
+  putStrLn "allocPin"
+--   pinExported <- doesDirectoryExist . pinPath $ ph
+--   unless pinExported $
+--     writeFile "/sys/class/gpio/export" $ show p
+--   writeFile (pinPath ph <> "/direction") "out"
   return ph
 
 freePin :: PinHandle -> IO ()
-freePin ph = do
-  pinExported <- doesDirectoryExist . pinPath $ ph
-  when pinExported $
-    writeFile "/sys/class/gpio/unexport" $ show ph
+freePin _ph = do
+  putStrLn "freePin"
+  -- pinExported <- doesDirectoryExist . pinPath $ ph
+  -- when pinExported $
+  --   writeFile "/sys/class/gpio/unexport" $ show ph
