@@ -12,13 +12,13 @@ import Data.Maybe (fromMaybe)
 import Data.Proxy (Proxy (Proxy))
 import Data.Text (unpack)
 import Data.Time.Clock (UTCTime)
-import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), Signature, FetchNFCKeysAPI)
+import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), Signature (..), FetchNFCKeysAPI)
 import Network.HTTP.Client (newManager, defaultManagerSettings)
 import Servant.Client (runClientM, client, ClientEnv, mkClientEnv, parseBaseUrl)
 
 
 emptySignature :: Signature
-emptySignature = Signature ""
+emptySignature = Signature mempty
 
 
 logAccessAttempt

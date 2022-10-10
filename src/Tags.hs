@@ -12,16 +12,14 @@ import Control.Monad             (forever, when, void)
 import Data.Aeson                (decode, encode)
 import Data.ByteString.Lazy      (readFile, writeFile)
 import Data.Text                 (Text, unpack)
-import Data.Text.Encoding        (encodeUtf8)
 import Data.Time.Clock (getCurrentTime)
-import Network.HTTP.Simple       (httpJSON, parseRequest_, addRequestHeader,
-                                  getResponseBody)
 import Prelude hiding            (readFile, writeFile)
 import System.Console.Concurrent (outputConcurrent)
 import System.Directory          (doesFileExist, removeFile)
 
+import DoorctlAPI (NFCKeys (..), NFCKey (..))
+import Api (fetchNFCKeys)
 import Config
-import Web
 
 type ValidTags = [Text]
 
@@ -45,15 +43,15 @@ tagService cfg vtVar = async $ do
     httpLoop = do
       tags <- onException (do
                             t <- getCurrentTime
-                            vts <- fetchNFCKeys cfg t
-                            void $ swapMVar vtVar vts
+                            NFCKeys vts <- fetchNFCKeys cfg t
+                            void $ swapMVar vtVar (unNFCKey <$> vts)
                             return vts)
                           (do
                             outputConcurrent ("http error\n" :: String)
                             threadDelay 5000000
                             httpLoop)
 
-      outputConcurrent $ "fetched " <> (show . length) (tags :: ValidTags)
+      outputConcurrent $ "fetched " <> (show . length) ((unNFCKey <$> tags) :: ValidTags)
                                     <> " valid tags\n"
 
       writeFile (unpack . tagCache $ cfg) (encode tags)
