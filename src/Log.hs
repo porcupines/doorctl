@@ -43,18 +43,11 @@ epochTimeToUTCTime =
 submitLogEntry :: Config -> LogEntry -> IO ()
 submitLogEntry cfg le = void . forkIO $ go
   where
-    signature = todo
-
     go = onException
       (logAccessAttempt cfg
         (epochTimeToUTCTime (leLoggedAt le))
         (if leGranted le then AccessGranted
          else AccessNotGranted)
-        (NFCKey (leNfcValue le))
-        signature)
+        (NFCKey (leNfcValue le)))
 
       (threadDelay (5 * 1000000) >> go)
-
-
-todo :: a
-todo = todo
