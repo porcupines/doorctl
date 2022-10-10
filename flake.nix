@@ -19,7 +19,7 @@
             });
           };
 
-        pkgs = nixpkgs.legacyPackages.${system}.pkgsMusl.appendOverlays([ overlay ]);
+        pkgs = nixpkgs.legacyPackages.${system}.appendOverlays([ overlay ]);
 
         haskellPackages = pkgs.haskellPackages;
 
