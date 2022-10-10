@@ -13,6 +13,7 @@ import Data.Aeson                (decode, encode)
 import Data.ByteString.Lazy      (readFile, writeFile)
 import Data.Text                 (Text, unpack)
 import Data.Text.Encoding        (encodeUtf8)
+import Data.Time.Clock (getCurrentTime)
 import Network.HTTP.Simple       (httpJSON, parseRequest_, addRequestHeader,
                                   getResponseBody)
 import Prelude hiding            (readFile, writeFile)
@@ -42,13 +43,9 @@ tagService cfg vtVar = async $ do
 
   where
     httpLoop = do
-      (ts, sig) <- genAPISignature . encodeUtf8 . doorSecret $ cfg
-      let initReq = parseRequest_ . unpack . doorNFCUrl $ cfg
-          req'    = addRequestHeader "X-Auth-Timestamp" ts initReq
-          req     = addRequestHeader "X-Auth-Signature" sig req'
-
       tags <- onException (do
-                            vts <- getResponseBody <$> httpJSON req
+                            t <- getCurrentTime
+                            vts <- fetchNFCKeys cfg t
                             void $ swapMVar vtVar vts
                             return vts)
                           (do
