@@ -17,18 +17,21 @@ import Network.HTTP.Client (newManager, defaultManagerSettings)
 import Servant.Client (runClientM, client, ClientEnv, mkClientEnv, parseBaseUrl)
 
 
+emptySignature :: Signature
+emptySignature = Signature ""
+
+
 logAccessAttempt
   :: Config
   -> UTCTime
   -> AccessAttemptResult
   -> NFCKey
-  -> Signature
   -> IO ()
-logAccessAttempt config time result key signature = do
+logAccessAttempt config time result key = do
   env <- accessAttemptClientEnv config
   res <- runClientM
     (client (Proxy @LogAccessAttemptAPI)
-      time result key signature)
+      time result key emptySignature) -- TODO: signature
     env
   case res of
     Right _ -> pure ()
@@ -46,12 +49,12 @@ accessAttemptClientEnv cfg = do
 
 
 fetchNFCKeys
-  :: Config -> UTCTime -> Signature -> IO NFCKeys
-fetchNFCKeys cfg time signature = do
+  :: Config -> UTCTime -> IO NFCKeys
+fetchNFCKeys cfg time = do
   env <- fetchNFCKeysClientEnv cfg
   res <- runClientM
     (client (Proxy @FetchNFCKeysAPI)
-      time signature)
+      time emptySignature) -- TODO: signature
     env
   case res of
     Right keys -> pure keys
