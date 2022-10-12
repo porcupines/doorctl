@@ -15,6 +15,7 @@ import Data.Time.Clock (UTCTime)
 import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), Signature (..), FetchNFCKeysAPI)
 import Network.HTTP.Client (newManager, defaultManagerSettings)
 import Servant.Client (runClientM, client, ClientEnv, mkClientEnv, parseBaseUrl)
+import System.Console.Concurrent (outputConcurrent)
 
 
 emptySignature :: Signature
@@ -28,16 +29,19 @@ logAccessAttempt
   -> NFCKey
   -> IO ()
 logAccessAttempt config time result key = do
+  outputConcurrent "logAccessAttempt\n"
   env <- accessAttemptClientEnv config
+  outputConcurrent "got accessAttemptClientEnv\n"
   res <- runClientM
     (client (Proxy @LogAccessAttemptAPI)
       time result key emptySignature) -- TODO: signature
     env
+  outputConcurrent "called LogAccessAttemptAPI\n"
   case res of
     Right _ -> pure ()
-    Left err -> putStrLn $
+    Left err -> outputConcurrent $
       "error logging access attempt: "
-      <> show err
+      <> show err <> "\n"
 
 
 accessAttemptClientEnv :: Config -> IO ClientEnv
@@ -51,23 +55,31 @@ accessAttemptClientEnv cfg = do
 fetchNFCKeys
   :: Config -> UTCTime -> IO NFCKeys
 fetchNFCKeys cfg time = do
+  outputConcurrent "fetchNFCKeys\n"
   env <- fetchNFCKeysClientEnv cfg
+  outputConcurrent "got fetchNFCKeysClientEnv\n"
   res <- runClientM
     (client (Proxy @FetchNFCKeysAPI)
       time emptySignature) -- TODO: signature
     env
+  outputConcurrent "called FetchNFCKeysAPI\n"
   case res of
     Right keys -> pure keys
     Left err -> do
-      putStrLn $
-        "error fetching NFC keys: "
-        <> show err
+      outputConcurrent $
+        "error fetching NFC keys: \n"
+        <> show err <> "\n"
       pure (NFCKeys [])
 
 
 fetchNFCKeysClientEnv :: Config -> IO ClientEnv
 fetchNFCKeysClientEnv cfg = do
+  outputConcurrent "fetchNFCKeysClientEnv\n"
   mgr <- newManager defaultManagerSettings
-  pure . mkClientEnv mgr
-    . fromMaybe (error "malformed doorNFCUrl")
-    $ parseBaseUrl (unpack (doorNFCUrl cfg))
+  outputConcurrent "newManager was successful\n"
+  case parseBaseUrl (unpack (doorNFCUrl cfg)) of
+    Just baseUrl ->
+      pure (mkClientEnv mgr baseUrl)
+    Nothing -> do
+      outputConcurrent "parseBaseUrl was unsuccessful :-(\n"
+      pure (error "foo")

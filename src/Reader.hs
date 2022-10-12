@@ -28,10 +28,10 @@ import Tags
 import Watchdog
 
 lockDoor :: PinHandle -> IO ()
-lockDoor _ = putStrLn "lock door"
+lockDoor _ = outputConcurrent ("lock door\n" :: String)
 
 unlockDoor :: PinHandle -> IO ()
-unlockDoor _ =  putStrLn "unlock door"
+unlockDoor _ = outputConcurrent ("unlock door\n" :: String)
 
 cycleDoor :: PinHandle -> Natural -> IO ()
 cycleDoor ph unlockTime = do
@@ -50,7 +50,7 @@ resetCountdown cfg countdownRef = do
 
 readerService :: Config -> MVar ValidTags -> IO [Async ()]
 readerService cfg vtVar = do
-  putStrLn "initialize NFC"
+  outputConcurrent ("initialize NFC\n" :: String)
   -- ctx <- NFC.initialize
 
   runResourceT $ do
@@ -75,7 +75,7 @@ readerService cfg vtVar = do
       outputConcurrent $ "[" <> readerId r <> "] opening reader\n"
 
       -- Open the reader device and set it to initiator mode.
-      putStrLn "Open NFC reader"
+      outputConcurrent ("Open NFC reader\n" :: String)
       -- maybeDev <- NFC.open ctx $ (unpack . readerDev) r
       -- let dev = fromMaybe (error "error opening device") maybeDev
       let dev = error "no device in test mode"
@@ -88,10 +88,10 @@ readerService cfg vtVar = do
 
   where
     readerLoop _dev pin reader countdownRef = do
-      putStrLn "Initiator poll target"
+      outputConcurrent ("Initiator poll target\n" :: String)
       -- let nfcMod = NFC.NFCModulation NFC.NmtIso14443a NFC.Nbr106
       -- maybeInfo <- NFC.initiatorPollTarget dev [nfcMod] 3 1
-      let maybeInfo = Just (error "no info")
+      let maybeInfo = Just (NFC.NFCTargetISO14443a (NFC.NFCISO14443aInfo 0 0 "FOOBAR" "FOOBAR"))
 
       resetCountdown cfg countdownRef
 

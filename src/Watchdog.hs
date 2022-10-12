@@ -9,7 +9,7 @@ import Data.Text                 (Text)
 import System.Console.Concurrent (outputConcurrent)
 
 import Config
-import Exit
+-- import Exit
 
 type Countdown = Int
 
@@ -19,6 +19,6 @@ watchdogService cfg name countdownRef = async . forever $ do
 
   when (countdown < 0) $ do
     outputConcurrent $ "[" <> name <> "] service stalled, aborting\n"
-    c_exit 1
+    -- c_exit 1
 
   threadDelay . (* 1000000) . fromIntegral . watchdogPeriod $ cfg

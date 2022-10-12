@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+
 module Tags
   ( ValidTags
   , tagService
@@ -42,9 +43,13 @@ tagService cfg vtVar = async $ do
   where
     httpLoop = do
       tags <- onException (do
+                            outputConcurrent ("httpLoop\n" :: String)
                             t <- getCurrentTime
+                            outputConcurrent ("getCurrentTime successful\n" :: String)
                             NFCKeys vts <- fetchNFCKeys cfg t
+                            outputConcurrent ("fetchNFCKeys successful\n" :: String)
                             void $ swapMVar vtVar (unNFCKey <$> vts)
+                            outputConcurrent ("swapMVar successful\n" :: String)
                             return vts)
                           (do
                             outputConcurrent ("http error\n" :: String)

@@ -7,6 +7,7 @@ module GPIO
   ) where 
 
 import Numeric.Natural  (Natural)
+import System.Console.Concurrent (outputConcurrent)
 
 newtype PinHandle = PinHandle { pinHandle :: Natural }
 
@@ -28,7 +29,7 @@ setPin ph ps = writeFile (pinPath ph <> "/value") $ show ps
 allocPin :: Natural -> IO PinHandle
 allocPin p = do
   let ph = PinHandle p
-  putStrLn "allocPin"
+  outputConcurrent ("allocPin\n" :: String)
 --   pinExported <- doesDirectoryExist . pinPath $ ph
 --   unless pinExported $
 --     writeFile "/sys/class/gpio/export" $ show p
@@ -37,7 +38,7 @@ allocPin p = do
 
 freePin :: PinHandle -> IO ()
 freePin _ph = do
-  putStrLn "freePin"
+  outputConcurrent ("freePin\n" :: String)
   -- pinExported <- doesDirectoryExist . pinPath $ ph
   -- when pinExported $
   --   writeFile "/sys/class/gpio/unexport" $ show ph
