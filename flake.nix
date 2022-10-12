@@ -3,9 +3,10 @@
 
   inputs = {
     nfc.url = "github:centromere/nfc";
+    doorctl-api.url = "git+ssh://git@github.com/porcupines/doorctl-api";
   };
 
-  outputs = { self, nixpkgs, flake-utils, nfc }:
+  outputs = { self, nixpkgs, flake-utils, nfc, doorctl-api }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         overlay = self: super:
@@ -13,6 +14,7 @@
             haskellPackages = super.haskellPackages.override ({
               overrides = hsSelf: hsSuper: {
                 nfc = nfc.packages.${system}.nfc;
+                doorctl-api = doorctl-api.packages.${system}.doorctl-api;
               };
             });
           };
