@@ -7,18 +7,23 @@ module Api
   ) where
 
 
-import Config (Config (doorLogUrl, doorNFCUrl))
+import DoorctlAPI (PrivateSigningKey (..))
+import Config (Config (doorLogUrl, doorNFCUrl, doorSecret))
 import Data.Maybe (fromMaybe)
 import Data.Proxy (Proxy (Proxy))
 import Data.Text (unpack)
+import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Clock (UTCTime)
-import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), Signature (..), FetchNFCKeysAPI)
+import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), FetchNFCKeysAPI, sign)
 import Network.HTTP.Client (newManager, defaultManagerSettings)
 import Servant.Client (runClientM, client, ClientEnv, mkClientEnv, parseBaseUrl)
 
 
-emptySignature :: Signature
-emptySignature = Signature mempty
+privateKey :: Config -> PrivateSigningKey
+privateKey =
+  PrivateSigningKey .
+  encodeUtf8 .
+  doorSecret
 
 
 logAccessAttempt
@@ -29,9 +34,10 @@ logAccessAttempt
   -> IO ()
 logAccessAttempt config time result key = do
   env <- accessAttemptClientEnv config
+  let sig = sign (privateKey config) (time, result, key)
   res <- runClientM
     (client (Proxy @LogAccessAttemptAPI)
-      time result key emptySignature) -- TODO: signature
+      time result key sig)
     env
   case res of
     Right _ -> pure ()
@@ -52,9 +58,9 @@ fetchNFCKeys
   :: Config -> UTCTime -> IO NFCKeys
 fetchNFCKeys cfg time = do
   env <- fetchNFCKeysClientEnv cfg
+  let sig = sign (privateKey cfg) time
   res <- runClientM
-    (client (Proxy @FetchNFCKeysAPI)
-      time emptySignature) -- TODO: signature
+    (client (Proxy @FetchNFCKeysAPI) time sig)
     env
   case res of
     Right keys -> pure keys

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+
 module Config
   ( Reader(..)
   , Config(..)
