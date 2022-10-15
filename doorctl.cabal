@@ -16,6 +16,7 @@ library
     , doorctl-api
     , directory
     , dhall
+    , ed25519
     , http-client
     , http-conduit
     , lifted-base
