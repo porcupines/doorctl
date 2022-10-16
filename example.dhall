@@ -1,4 +1,4 @@
-{ doorSecret = "+CGxmAPCMPR6O78iBbtBwZGAgi4z9TC7zA0DMNRcFywuWEazgHFb5HVwS0mpV7AxazpTO670qUNZTSlFqoBpZw=="
+{ doorSecret = "7URUnuqvqEyOw2jlupmYVcmYIS2a6/mhAhXdP1jqilXN5zFdTJoQC9b4u0leuvz0uRzRoaa73IQeQqSBbvL+9g=="
 , doorNFCUrl = "http://localhost:8081/"
 , doorLogUrl = "http://localhost:8081/"
 , nfcRefreshRate = 1

@@ -6,11 +6,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1665878327,
-        "narHash": "sha256-HBdRjEp5acWnH1yJ8MZvfH53Vi+Bxfwga5lQU+ZUsqc=",
+        "lastModified": 1665879410,
+        "narHash": "sha256-CfKKTUDHAFjHGqGd5p6qdqf8108Xn8huZtOXH/2QsGs=",
         "ref": "refs/heads/master",
-        "rev": "75e527179cf6fdef644e65e1cc8bc80689649ae8",
-        "revCount": 25,
+        "rev": "b06ed545d499b52a773ddf110ed0a1ab9b7cf3c9",
+        "revCount": 26,
         "type": "git",
         "url": "ssh://git@github.com/porcupines/doorctl-api"
       },
