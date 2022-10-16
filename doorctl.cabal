@@ -18,6 +18,7 @@ library
     , dhall
     , ed25519
     , http-client
+    , http-client-tls
     , http-conduit
     , lifted-base
     , nfc

@@ -15,7 +15,8 @@ import Data.Text (unpack)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Time.Clock (UTCTime)
 import DoorctlAPI (LogAccessAttemptAPI, NFCKey (..), AccessAttemptResult (..), NFCKeys (..), FetchNFCKeysAPI, sign)
-import Network.HTTP.Client (newManager, defaultManagerSettings)
+import Network.HTTP.Client (newManager)
+import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Servant.Client (runClientM, client, ClientEnv, mkClientEnv, parseBaseUrl)
 
 
@@ -48,7 +49,7 @@ logAccessAttempt config time result key = do
 
 accessAttemptClientEnv :: Config -> IO ClientEnv
 accessAttemptClientEnv cfg = do
-  mgr <- newManager defaultManagerSettings
+  mgr <- newManager tlsManagerSettings
   pure . mkClientEnv mgr 
     . fromMaybe (error ("malformed doorLogUrl"))
     $ parseBaseUrl (unpack (doorLogUrl cfg))
@@ -73,7 +74,7 @@ fetchNFCKeys cfg time = do
 
 fetchNFCKeysClientEnv :: Config -> IO ClientEnv
 fetchNFCKeysClientEnv cfg = do
-  mgr <- newManager defaultManagerSettings
+  mgr <- newManager tlsManagerSettings
   pure . mkClientEnv mgr
     . fromMaybe (error "malformed doorNFCUrl")
     $ parseBaseUrl (unpack (doorNFCUrl cfg))
