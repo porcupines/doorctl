@@ -54,6 +54,6 @@ tagService cfg vtVar = async $ do
       outputConcurrent $ "fetched " <> (show . length) ((unNFCKey <$> tags) :: ValidTags)
                                     <> " valid tags\n"
 
-      writeFile (unpack . tagCache $ cfg) (encode tags)
+      when (length tags > 0) $ writeFile (unpack . tagCache $ cfg) (encode tags)
 
       threadDelay . (* 1000000) . fromIntegral . nfcRefreshRate $ cfg
