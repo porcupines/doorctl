@@ -45,9 +45,10 @@ tagService cfg vtVar = async $ do
                             t <- getCurrentTime
                             maybeVts <- fetchNFCKeys cfg t
                             case maybeVts of
-                              Just (NFCKeys vts) -> do
-                                void $ swapMVar vtVar (unNFCKey <$> vts)
-                                return vts
+                              Just (NFCKeys validNFCKeys) -> do
+                                let validTags = unNFCKey <$> validNFCKeys
+                                void $ swapMVar vtVar validTags
+                                return validTags
                               Nothing -> do
                                 outputConcurrent ("httpLoop: error fetching tags\n" :: String)
                                 return []
@@ -57,7 +58,7 @@ tagService cfg vtVar = async $ do
                             threadDelay 5000000
                             httpLoop)
 
-      outputConcurrent $ "fetched " <> (show . length) ((unNFCKey <$> tags) :: ValidTags)
+      outputConcurrent $ "fetched " <> (show . length) tags
                                     <> " valid tags\n"
 
       when (length tags > 0) $ writeFile (unpack . tagCache $ cfg) (encode tags)
