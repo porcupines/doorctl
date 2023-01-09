@@ -2,108 +2,50 @@
   "nodes": {
     "doorctl-api": {
       "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
       },
       "locked": {
-        "lastModified": 1665878327,
-        "narHash": "sha256-HBdRjEp5acWnH1yJ8MZvfH53Vi+Bxfwga5lQU+ZUsqc=",
-        "ref": "refs/heads/master",
-        "rev": "75e527179cf6fdef644e65e1cc8bc80689649ae8",
-        "revCount": 25,
+        "lastModified": 1673287297,
+        "narHash": "sha256-u1a93T+A+/i0bKk2y+M84QbrnLYMo086B+zwkwsvkDs=",
+        "ref": "optional-postgres",
+        "rev": "a3ec787f355a92015c66f4e458d939e403e19cd0",
+        "revCount": 31,
         "type": "git",
         "url": "ssh://git@github.com/porcupines/doorctl-api"
       },
       "original": {
+        "ref": "optional-postgres",
         "type": "git",
         "url": "ssh://git@github.com/porcupines/doorctl-api"
       }
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1659877975,
-        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
+        "lastModified": 1667395993,
+        "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
+        "rev": "5aed5285a952e0b949eb3ba02c12fa4fcfef535f",
         "type": "github"
       },
       "original": {
         "owner": "numtide",
         "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_2": {
-      "locked": {
-        "lastModified": 1659877975,
-        "narHash": "sha256-zllb8aq3YO3h8B/U0/J1WBgAL8EX5yWf5pMj3G0NAmc=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "c0e246b9b83f637f4681389ecabcb2681b4f3af0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_3": {
-      "locked": {
-        "lastModified": 1656928814,
-        "narHash": "sha256-RIFfgBuKz6Hp89yRr7+NR5tzIAbn52h8vT6vXkYjZoM=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "7e2a3b3dfd9af950a856d66b0a7d01e3c18aa249",
-        "type": "github"
-      },
-      "original": {
-        "id": "flake-utils",
-        "type": "indirect"
-      }
-    },
-    "nfc": {
-      "inputs": {
-        "flake-utils": "flake-utils_3",
-        "nixpkgs": "nixpkgs_2"
-      },
-      "locked": {
-        "lastModified": 1658368028,
-        "narHash": "sha256-8fvbHGd89unHghw9G861KxHJDOkUNBuKs5tdEg1w2n4=",
-        "owner": "centromere",
-        "repo": "nfc",
-        "rev": "8a1beb3fb02c6800d884b56b1272acb34443ab47",
-        "type": "github"
-      },
-      "original": {
-        "owner": "centromere",
-        "repo": "nfc",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1665907538,
-        "narHash": "sha256-mDpTY5Xd3JTMa/6p7UjJjOChpmYGgkhBodmxzN9NuJ0=",
+        "lastModified": 1673180965,
+        "narHash": "sha256-gMhL6w9RVluvPs+irJ9n0Q1BphZm+Ek4XGn5Ow7YQ3k=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "2e193264db568a42b342e4b914dc314383a6194c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs_2": {
-      "locked": {
-        "lastModified": 1658311025,
-        "narHash": "sha256-GqagY5YmaZB3YaO41kKcQhe5RcpS83wnsW8iCu5Znqo=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "cd8d1784506a7c7eb0796772b73437e0b82fad57",
+        "rev": "0c9aadc8eff6daaa5149d2df9e6c49baaf44161c",
         "type": "github"
       },
       "original": {
@@ -111,27 +53,11 @@
         "type": "indirect"
       }
     },
-    "nixpkgs_3": {
-      "locked": {
-        "lastModified": 1665915750,
-        "narHash": "sha256-KfuxHgwccTW/BmPbZFzC5KjrqWTjPj5Ev6Yscm0FP1w=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "e569855125fa58194f26577b4e3761e88216eab3",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "doorctl-api": "doorctl-api",
-        "flake-utils": "flake-utils_2",
-        "nfc": "nfc",
-        "nixpkgs": "nixpkgs_3"
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
       }
     }
   },
