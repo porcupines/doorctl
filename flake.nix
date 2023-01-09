@@ -2,26 +2,55 @@
   description = "doorctl";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
-    nfc.url = "github:centromere/nfc";
-    doorctl-api.url = "git+ssh://git@github.com/porcupines/doorctl-api";
+
+    doorctl-api = {
+      url = "git+ssh://git@github.com/porcupines/doorctl-api?ref=optional-postgres";
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        nixpkgs.follows = "nixpkgs";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, nfc, doorctl-api }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, flake-utils, doorctl-api }:
+    flake-utils.lib.eachSystem [
+      flake-utils.lib.system.aarch64-linux
+      # flake-utils.lib.system.x86_64-linux
+    ] (system:
       let
-        overlay = self: super:
-          {
-            haskellPackages = super.haskellPackages.override ({
-              overrides = hsSelf: hsSuper: {
-                nfc = nfc.packages.${system}.nfc;
-                doorctl-api = doorctl-api.packages.${system}.doorctl-api;
-              };
-            });
-          };
+        overlay = final: prev: {
+          haskellPackages = prev.haskell.packages.ghc944.override {
+            overrides = hsFinal: hsPrev: {
+              cborg = prev.haskellPackages.cborg;
+              doorctl-api = doorctl-api.packages.${system}.doorctl-api-controller;
 
-        pkgs = nixpkgs.legacyPackages.${system}.appendOverlays([ overlay ]);
+              servant = final.haskell.lib.overrideCabal hsPrev.servant (old: {
+                doHaddock = false;
+                doCheck = false; # Depends on hspec <2.10, and nixpkgs is newer
+              });
+
+              servant-client = final.haskell.lib.overrideCabal hsPrev.servant-client (old: {
+                doHaddock = false;
+                doCheck = false; # Depends on hspec <2.10, and nixpkgs is newer
+              });
+              servant-client-core = final.haskell.lib.overrideCabal hsPrev.servant-client-core (old: {
+                doHaddock = false;
+                doCheck = false; # Depends on hspec <2.10, and nixpkgs is newer
+              });
+
+              servant-server = final.haskell.lib.overrideCabal hsPrev.servant-server (old: {
+                doHaddock = false;
+                doCheck = false; # Depends on hspec <2.10, and nixpkgs is newer
+              });
+            };
+          };
+        };
+
+        pkgs = nixpkgs.legacyPackages.${system}.appendOverlays([
+          doorctl-api.overlays.${system}.default
+          overlay
+        ]);
 
         haskellPackages = pkgs.haskellPackages;
 
@@ -36,12 +65,19 @@
             root = ./.;
             name = packageName;
             returnShellEnv = !(devTools == [ ]);
+
             modifier = (t.flip t.pipe) [
               addBuildTools
-              hl.dontHaddock
-              hl.disableLibraryProfiling
               hl.disableExecutableProfiling
+              hl.linkWithGold
+              hl.justStaticExecutables
+              hl.enableStaticLibraries
             ];
+
+            source-overrides = {
+              attoparsec-iso8601 = "1.1.0.0";
+              http-api-data = "0.5";
+            };
           };
       in {
         packages.${packageName} = project [ ];

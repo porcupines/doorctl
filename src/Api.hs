@@ -56,7 +56,7 @@ accessAttemptClientEnv cfg = do
 
 
 fetchNFCKeys
-  :: Config -> UTCTime -> IO NFCKeys
+  :: Config -> UTCTime -> IO (Maybe NFCKeys)
 fetchNFCKeys cfg time = do
   env <- fetchNFCKeysClientEnv cfg
   let sig = sign (privateKey cfg) time
@@ -64,12 +64,12 @@ fetchNFCKeys cfg time = do
     (client (Proxy @FetchNFCKeysAPI) time sig)
     env
   case res of
-    Right keys -> pure keys
+    Right keys -> pure . pure $ keys
     Left err -> do
       putStrLn $
         "error fetching NFC keys: "
         <> show err
-      pure (NFCKeys [])
+      pure Nothing
 
 
 fetchNFCKeysClientEnv :: Config -> IO ClientEnv

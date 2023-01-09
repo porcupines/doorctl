@@ -43,11 +43,17 @@ tagService cfg vtVar = async $ do
     httpLoop = do
       tags <- onException (do
                             t <- getCurrentTime
-                            NFCKeys vts <- fetchNFCKeys cfg t
-                            void $ swapMVar vtVar (unNFCKey <$> vts)
-                            return vts)
+                            maybeVts <- fetchNFCKeys cfg t
+                            case maybeVts of
+                              Just (NFCKeys vts) -> do
+                                void $ swapMVar vtVar (unNFCKey <$> vts)
+                                return vts
+                              Nothing -> do
+                                outputConcurrent ("httpLoop: error fetching tags\n" :: String)
+                                return []
+                          )
                           (do
-                            outputConcurrent ("http error\n" :: String)
+                            outputConcurrent ("httpLoop: caught exception\n" :: String)
                             threadDelay 5000000
                             httpLoop)
 
