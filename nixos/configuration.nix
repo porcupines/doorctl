@@ -27,7 +27,7 @@ in {
 
   environment.systemPackages = with pkgs; [
     cachix
-    #doorctl.packages.aarch64-linux.doorctl
+    doorctl.packages.aarch64-linux.doorctl
     git
     libnfc
     tmux
@@ -49,12 +49,12 @@ in {
         "/run/current-system/sw/bin/stty -F /dev/basement_reader 115200"
         "/run/current-system/sw/bin/stty -F /dev/stairs_reader 115200"
       ];
-      ExecStart = "/home/alex/doorctl-tag-cache-fix /etc/doorctl.conf";
+      ExecStart = "${doorctl.packages.aarch64-linux.doorctl}/bin/doorctl /etc/doorctl.conf";
       KillSignal = "SIGKILL";
     };
 
     restartTriggers = [
-      #doorctl.packages.aarch64-linux.doorctl
+      doorctl.packages.aarch64-linux.doorctl
     ];
 
     wantedBy = [ "multi-user.target" ];
