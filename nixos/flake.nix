@@ -1,8 +1,8 @@
 {
   inputs.nixos-hardware.url = github:NixOS/nixos-hardware/master;
-  # inputs.doorctl.url = github:porcupines/doorctl;
+  inputs.doorctl.url = "git+ssh://git@github.com/porcupines/doorctl";
 
-  outputs = { self, nixpkgs, nixos-hardware }@attrs: {
+  outputs = { self, nixpkgs, nixos-hardware, doorctl }@attrs: {
     nixosConfigurations.doorpi = nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       specialArgs = attrs;
