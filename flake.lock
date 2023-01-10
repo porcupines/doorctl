@@ -10,11 +10,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1673319646,
-        "narHash": "sha256-u1a93T+A+/i0bKk2y+M84QbrnLYMo086B+zwkwsvkDs=",
+        "lastModified": 1673320950,
+        "narHash": "sha256-spQEBBJYO+ABm5CfAjn5aBKdPbm52NjHiOPjOP81Z20=",
         "ref": "refs/heads/master",
-        "rev": "c6a9ef20311d05fe335e648f17538400ed14e5b8",
-        "revCount": 32,
+        "rev": "ed11540a7f028e52f565280e550f95c5a340c368",
+        "revCount": 33,
         "type": "git",
         "url": "ssh://git@github.com/porcupines/doorctl-api"
       },
