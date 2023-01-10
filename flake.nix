@@ -5,7 +5,7 @@
     flake-utils.url = "github:numtide/flake-utils";
 
     doorctl-api = {
-      url = "git+ssh://git@github.com/porcupines/doorctl-api?ref=optional-postgres";
+      url = "git+ssh://git@github.com/porcupines/doorctl-api";
       inputs = {
         flake-utils.follows = "flake-utils";
         nixpkgs.follows = "nixpkgs";
