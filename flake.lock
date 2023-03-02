@@ -10,11 +10,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1673320950,
-        "narHash": "sha256-spQEBBJYO+ABm5CfAjn5aBKdPbm52NjHiOPjOP81Z20=",
+        "lastModified": 1677772733,
+        "narHash": "sha256-ai9wsLDUdaj/FuMI3StXEjXBUR01w44yGjQrMRyag6c=",
         "ref": "refs/heads/master",
-        "rev": "ed11540a7f028e52f565280e550f95c5a340c368",
-        "revCount": 33,
+        "rev": "f7298c1aabe1ff80cd394b0eb6229ceb545d7fa8",
+        "revCount": 34,
         "type": "git",
         "url": "ssh://git@github.com/porcupines/doorctl-api"
       },
@@ -25,11 +25,11 @@
     },
     "flake-utils": {
       "locked": {
-        "lastModified": 1667395993,
-        "narHash": "sha256-nuEHfE/LcWyuSWnS8t12N1wc105Qtau+/OdUAjtQ0rA=",
+        "lastModified": 1676283394,
+        "narHash": "sha256-XX2f9c3iySLCw54rJ/CZs+ZK6IQy7GXNY4nSOyu2QG4=",
         "owner": "numtide",
         "repo": "flake-utils",
-        "rev": "5aed5285a952e0b949eb3ba02c12fa4fcfef535f",
+        "rev": "3db36a8b464d0c4532ba1c7dda728f4576d6d073",
         "type": "github"
       },
       "original": {
